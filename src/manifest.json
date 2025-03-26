@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Tumblr Screenshot Tool",
+  "version": "0.1.0",
+  "author": "FireIsGood",
+  "homepage_url": "https://example.com",
+  "description": "An extension to test how they work",
+  "icons": {
+    "48": "images/icon-48.png",
+    "128": "images/icon-128.png"
+  },
+  "host_permissions": ["https://*.tumblr.com/*"],
+  "action": {
+    "default_icon": {
+      "48": "images/icon-48.png",
+      "128": "images/icon-128.png"
+    },
+    "default_title": "Tumblr Screenshot UI",
+    "default_popup": "action/popup.html"
+  },
+  "permissions": ["storage", "activeTab", "clipboardWrite"],
+  "background": {
+    "service_worker": "service_worker/service_worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.tumblr.com/*"],
+      "exclude_matches": [
+        "*://www.tumblr.com/login",
+        "*://www.tumblr.com/register",
+        "*://www.tumblr.com/register?*",
+        "*://www.tumblr.com/privacy/*"
+      ],
+      "css": ["content_scripts/tumblr.css", "content_scripts/fonts.css"],
+      "js": ["lib/modern-screenshot.min.js", "lib/moment.min.js", "content_scripts/tumblr.js"]
+    }
+  ]
+}

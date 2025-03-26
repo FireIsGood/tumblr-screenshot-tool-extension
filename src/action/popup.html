@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tumblr Screenshot Tool</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Tumblr Screenshot Tool</h1>
+    <p>Status: <span id="status-text">unknown</span></p>
+    <div class="menu-controls">
+      <button id="scan-posts">Scan posts</button>
+      <button id="toggle-menu">Toggle Menu</button>
+      <button id="unstyle-blog" class="hidden-option">Unstyle blog</button>
+    </div>
+
+    <script src="/lib/jquery.min.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
