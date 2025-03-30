@@ -1,5 +1,6 @@
 "use strict";
 
+// Relays external events from the extension api
 function handleExternalEvents(request, sender, sendResponse) {
   if (sender.id !== chrome.runtime.id) return;
   document.documentElement.dispatchEvent(new CustomEvent(request.data.event));
@@ -7,6 +8,7 @@ function handleExternalEvents(request, sender, sendResponse) {
   return true;
 }
 
+// Downloads a given canvas element under the specified file name
 function downloadCanvas(canvasImg, fileName) {
   const downloadLink = document.createElement("a");
   downloadLink.href = canvasImg.toDataURL();
@@ -14,6 +16,7 @@ function downloadCanvas(canvasImg, fileName) {
   downloadLink.click();
 }
 
+// Returns whether a given element is at all visible
 function isVisible(elem) {
   const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
   const rect = elem.getBoundingClientRect();
@@ -25,23 +28,90 @@ function isVisible(elem) {
   return visible;
 }
 
+// Runs a given function after a delay ignoring re-callings of it until the callback is run
+const debounce = (callback, wait) => {
+  let timeoutId = null;
+  return (...args) => {
+    window.clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => {
+      callback.apply(null, args);
+    }, wait);
+  };
+};
+
+// Adds target rings to each of the elements with curried redrawing
 function addTargetingRing(postElem) {
-  const ringElement = document.createElement("div");
-  ringElement.classList.add("ts-ring-selector");
+  const ringElement = $('<div class="ts-ring-selector"></div>');
 
   // Make it line up initially and on change
-  const alignRing = function () {
+  const alignRing = () => {
     const rect = postElem.getBoundingClientRect();
-    ringElement.style.top = rect.top + window.scrollY + "px";
-    ringElement.style.left = rect.left + window.scrollX + "px";
-    ["width", "height"].forEach((dimension) => {
-      ringElement.style[dimension] = rect[dimension] + "px";
+    ringElement.css({
+      top: rect.top + window.scrollY + "px",
+      left: rect.left + window.scrollX + "px",
+      width: rect.width + "px",
+      height: rect.height + "px",
     });
   };
   alignRing();
 
+  // Add controls
+  const updateCloseNotesButton = (elem) => {
+    if ($(postElem).find("div.ePsyd").length === 0) return;
+    elem.removeClass("hidden");
+  };
+  const closeNotesButton = $('<button class="ts-ring-button">Close Notes</button>').click((event) => {
+    $(postElem).find("div.ePsyd").click();
+    $(event.target).addClass("hidden");
+  });
+  closeNotesButton.addClass(() => {
+    if ($(postElem).find("div.ePsyd")[0]) return "";
+    return "hidden";
+  });
+  closeNotesButton.appendTo(ringElement);
+
+  const resetSelect = debounce((elem, text) => {
+    elem.innerText = text;
+  }, 750);
+  $('<button class="ts-ring-button primary">Select</button>')
+    .click((event) => {
+      openMenu();
+      loadPostIntoMenu(postElem);
+      event.target.innerText = "Selected!";
+      resetSelect(event.target, "Select");
+    })
+    .appendTo(ringElement);
+
+  const resetCopy = debounce((elem, text) => {
+    elem.innerText = text;
+  }, 750);
+  $(`<div class="ts-button-vertical-stack">
+    </div>`)
+    .append(
+      $('<button class="ts-ring-button primary">Copy HTML</button>').click((event) => {
+        navigator.clipboard.writeText(postElem.outerHTML);
+        event.target.innerText = "Copied HTML!";
+        resetCopy(event.target, "Copy HTML");
+      })
+    )
+    .append(
+      $(
+        '<a href="https://fireisgood.github.io/tumblr-screenshot-tool/" target="_blank" class="ts-web-link">website screenshotter</a>'
+      )
+    )
+    .appendTo(ringElement);
+
+  $('<button class="ts-ring-button">&times;</button>')
+    .click(() => {
+      ringElement.remove();
+    })
+    .appendTo(ringElement);
+
   // Observer for on body change
-  const mutationObserver = new MutationObserver(() => alignRing());
+  const mutationObserver = new MutationObserver(() => {
+    alignRing();
+    updateCloseNotesButton(closeNotesButton);
+  });
   mutationObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
 
   // Remove the ring if it goes off screen
@@ -57,26 +127,7 @@ function addTargetingRing(postElem) {
   );
   intersectionObserver.observe(postElem);
 
-  // Add controls
-  const selectButton = document.createElement("button");
-  selectButton.classList.add("ts-button");
-  selectButton.innerText = "Select";
-  selectButton.addEventListener("click", async () => {
-    removeTargetRings();
-    openMenu();
-    await loadPostIntoMenu(postElem);
-  });
-  ringElement.append(selectButton);
-
-  const copyButton = document.createElement("button");
-  copyButton.classList.add("ts-button");
-  copyButton.innerText = "Copy";
-  copyButton.addEventListener("click", async () => {
-    navigator.clipboard.writeText(postElem.outerHTML);
-  });
-  ringElement.append(copyButton);
-
-  document.body.append(ringElement);
+  $("body").append(ringElement);
 }
 
 function removeTargetRings() {
@@ -246,9 +297,7 @@ async function loadPostIntoMenu(postRoot) {
 
   // Process and set aside to render
   const postCopy = await processPost(postRoot);
-  const renderContainer = document.querySelector("#ts-render-wrapper-inner");
-  renderContainer.innerHTML = "";
-  renderContainer.append(postCopy);
+  $("#ts-render-wrapper-inner").empty().append(postCopy);
 
   // Render and display
   const renderOuter = document.querySelector("#ts-render-wrapper");

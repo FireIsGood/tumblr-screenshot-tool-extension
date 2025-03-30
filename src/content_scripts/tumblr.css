@@ -121,22 +121,96 @@
 
 /* Selectors */
 .ts-ring-selector {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.5rem;
   box-sizing: border-box;
   position: absolute;
-  border: 1px solid red;
+  border: 2px dashed #b8b9be;
+  border-radius: 8px;
 
   pointer-events: none;
 
-  animation: float-in 200ms ease-out;
+  animation: fade-in 200ms ease-out;
 }
 
-@keyframes float-in {
+@keyframes fade-in {
   from {
-    translate: 0 4px;
+    opacity: 0;
   }
   to {
-    translate: 0 0;
+    opacity: 1;
   }
+}
+
+.ts-ring-button {
+  box-sizing: border-box;
+  display: block;
+  padding: 0.4rem 0.8rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 700;
+  background-color: #e6e7ee;
+  color: #44476a;
+  border: var(--nu-border);
+  border-radius: 8px;
+  box-shadow:
+    0 3px 4px -2px #000a,
+    0 3px 2px #0002;
+  transition: 100ms ease-out;
+
+  pointer-events: all;
+
+  &:hover {
+    translate: 0 1px;
+    box-shadow:
+      0 2px 4px -2px #000a,
+      0 2px 2px #0002;
+  }
+  &:disabled,
+  &:active {
+    color: #31344b;
+    translate: 0 3px;
+    box-shadow:
+      0 0px 4px -2px #000a,
+      0 0px 2px #0002;
+  }
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &.primary {
+    background-color: #dbede2;
+    border-color: #cdddd6;
+  }
+
+  &.icon-only {
+    width: 2.575rem;
+    height: 2.575rem;
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
+.ts-button-vertical-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ts-web-link {
+  width: min-content;
+  color: #347355;
+  background-color: #dbede2fa;
+  text-align: center;
+  pointer-events: all;
+  margin: 0.1rem;
+  border-radius: 4px;
 }
 
 .ts-button {
@@ -149,8 +223,6 @@
   font-weight: 700;
   background-color: #e6e7ee;
   box-shadow: var(--nu-shadow);
-
-  pointer-events: all;
 
   &:active {
     box-shadow: var(--nu-shadow-inset);
