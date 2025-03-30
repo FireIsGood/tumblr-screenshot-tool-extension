@@ -85,7 +85,6 @@
   opacity: 0;
   z-index: 1;
   pointer-events: none;
-  --font-family: "TS_Favorit", cursive;
 
   & .FtjPK.r0etU {
     box-shadow: unset;
@@ -178,15 +177,6 @@
   text-align: center;
   font-size: 1.5rem;
   padding: 0;
-}
-
-/* Try to fix it? */
-@font-face {
-  font-family: TS_Favorit;
-  src: url("/lib/favorit.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
 }
 
 /* Post presets */
