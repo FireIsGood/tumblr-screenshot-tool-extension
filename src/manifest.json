@@ -3,8 +3,8 @@
   "name": "Tumblr Screenshot Tool",
   "version": "0.1.0",
   "author": "FireIsGood",
-  "homepage_url": "https://example.com",
-  "description": "An extension to test how they work",
+  "homepage_url": "https://github.com/FireIsGood/tumblr-screenshot-tool-extension",
+  "description": "An extension that lets you easily screenshot Tumblr posts.",
   "icons": {
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
