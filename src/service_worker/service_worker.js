@@ -7,19 +7,23 @@ async function relayToContent(data) {
   return response;
 }
 
-function init() {
-  chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    if (sender.id !== chrome.runtime.id) return;
+// Mirrors messages from the Action to the active tab
+// NOTE: This *must* be sync and return the value "true" to actually work.
+function handleMessages(request, sender, sendResponse) {
+  if (sender.id !== chrome.runtime.id) return;
 
-    console.log("From Action to Content Script:", request);
-    relayToContent(request.data).then((response) => {
-      console.log("From Content Script to Action:", response);
-      sendResponse(response);
-    });
-
-    // Enable async return
-    return true;
+  console.log("From Action to Content Script:", request);
+  relayToContent(request.data).then((response) => {
+    console.log("From Content Script to Action:", response);
+    sendResponse(response);
   });
+
+  // Enable async return
+  return true;
+}
+
+function init() {
+  chrome.runtime.onMessage.addListener(handleMessages);
 }
 
 init();
