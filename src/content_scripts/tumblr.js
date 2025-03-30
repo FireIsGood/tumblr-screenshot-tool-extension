@@ -80,7 +80,7 @@ function addTargetingRing(postElem) {
 }
 
 function removeTargetRings() {
-  [...document.querySelectorAll(".ts-ring-selector")].forEach((elem) => elem.remove());
+  $(".ts-ring-selector").remove();
 }
 
 function selectArticles() {
@@ -88,118 +88,84 @@ function selectArticles() {
   removeTargetRings();
 
   // Add rings to all visible posts
-  const allPosts = [...document.querySelectorAll("#base-container article")];
-  const visiblePosts = allPosts.filter((elem) => isVisible(elem));
-  visiblePosts.forEach((elem) => addTargetingRing(elem));
+  $("#base-container article")
+    .filter((_, elem) => isVisible(elem))
+    .each((_, elem) => addTargetingRing(elem));
 }
 
 function createMenu() {
   // Idempotency
-  if (document.querySelector("#ts-menu") !== null) return;
+  if ($("#ts-menu")[0]) return;
 
-  const menuElement = document.createElement("div");
-  menuElement.id = "ts-menu";
+  const menuElement = $(`<div id="ts-menu"></div>`);
 
   // Close button
-  const closeButtonElement = document.createElement("div");
-  closeButtonElement.classList.add("ts-button", "icon-only", "ts-close-button");
-  closeButtonElement.innerHTML = "&times;";
-  closeButtonElement.addEventListener("click", closeMenu);
-  menuElement.append(closeButtonElement);
+  $(`<div class="ts-button icon-only ts-close-button">&times;</div>`).click(closeMenu).appendTo(menuElement);
 
   // Render container (secret spot to render the post)
-  const renderContainer = document.createElement("div");
-  renderContainer.id = "ts-render-container";
-  menuElement.append(renderContainer);
-  const renderScrollerElement = document.createElement("div");
-  renderScrollerElement.classList.add("ts-scroller");
-  renderContainer.append(renderScrollerElement);
-  const renderWrapper = document.createElement("div");
-  renderWrapper.id = "ts-render-wrapper";
-  renderScrollerElement.append(renderWrapper);
-  const renderWrapperInner = document.createElement("div");
-  renderWrapperInner.id = "ts-render-wrapper-inner";
-  renderWrapper.append(renderWrapperInner);
+  $(`
+    <div id="ts-render-container">
+      <div class="ts-scroller">
+        <div id="ts-render-wrapper">
+          <div id="ts-render-wrapper-inner"></div>
+        </div>
+      </div>
+    </div>
+  `).appendTo(menuElement);
 
   // Layout container (things go here wow)
-  const layoutContainer = document.createElement("div");
-  layoutContainer.classList.add("ts-menu-layout");
-  menuElement.append(layoutContainer);
+  $(`
+    <div class="ts-menu-layout">
+      <div id="ts-output-container" class="ts-card">
+        <div class="ts-scroller">
+          <div id="ts-output-inner"></div>
+        </div>
+        <p id="ts-progress-element"></p>
+      </div>
+      <div class="ts-controls">
+        <fieldset id="ts-settings">
+          <legend>Settings</legend>
+        </fieldset>
+        <fieldset id="ts-output-controls" class="ts-horizontal-buttons">
+          <legend>Output</legend>
+        </fieldset>
+      </div>
+    </div>
+  `).appendTo(menuElement);
 
-  // Output container (where the canvas goes)
-  const outputContainer = document.createElement("div");
-  outputContainer.id = "ts-output-container";
-  outputContainer.classList.add("ts-card");
-  layoutContainer.append(outputContainer);
-  const scrollerElement = document.createElement("div");
-  scrollerElement.classList.add("ts-scroller");
-  outputContainer.append(scrollerElement);
-  const outputInner = document.createElement("div");
-  outputInner.id = "ts-output-inner";
-  scrollerElement.append(outputInner);
-
-  const progressElement = document.createElement("p");
-  progressElement.id = "ts-progress-element";
-  outputContainer.prepend(progressElement);
-
-  // Controls container
-  const controlsContainer = document.createElement("div");
-  controlsContainer.classList.add("ts-controls");
-  layoutContainer.append(controlsContainer);
-
-  // Settings
-  const settingsContainer = document.createElement("fieldset");
-  settingsContainer.classList.add("ts-settings");
-  const settingsLegend = document.createElement("legend");
-  settingsLegend.innerText = "Settings";
-  settingsContainer.append(settingsLegend);
-  controlsContainer.append(settingsContainer);
-
-  // Placeholder option
-  const placeholderElement = document.createElement("input");
-  placeholderElement.type = "checkbox";
-  placeholderElement.id = "placeholder-option";
-  const placeholderLabelElement = document.createElement("label");
-  placeholderLabelElement.innerText = "Placeholder option (wow!)";
-  placeholderLabelElement.setAttribute("for", "placeholder-option");
-  settingsContainer.append(placeholderElement);
-  settingsContainer.append(placeholderLabelElement);
+  // Options (only a placeholder for now)
+  $(`
+    <input type="checkbox" id="placeholder-option"></input>
+    <label for="placeholder-option">Placeholder option (wow!)</input>
+  `).appendTo(menuElement.find("#ts-settings"));
 
   // Output buttons
-  const outputButtonsContainer = document.createElement("fieldset");
-  outputButtonsContainer.classList.add("ts-horizontal-buttons");
-  const outputButtonsLegend = document.createElement("legend");
-  outputButtonsLegend.innerText = "Output";
-  outputButtonsContainer.append(outputButtonsLegend);
-  controlsContainer.append(outputButtonsContainer);
-
-  // Save button
-  const saveButtonElement = document.createElement("button");
-  saveButtonElement.innerText = "Save";
-  saveButtonElement.classList.add("ts-button");
-  outputButtonsContainer.append(saveButtonElement);
-  saveButtonElement.addEventListener("click", () => {
-    const img = document.querySelector("#ts-output-inner > canvas");
-    downloadCanvas(img, "post.png");
-  });
+  $(`
+    <button class="ts-button">Save</button>
+  `)
+    .click(() => {
+      const img = document.querySelector("#ts-output-inner > canvas");
+      downloadCanvas(img, "post.png");
+    })
+    .appendTo(menuElement.find("#ts-output-controls"));
 
   // Copy button
-  const copyButtonElement = document.createElement("button");
-  copyButtonElement.innerText = "Copy";
-  copyButtonElement.classList.add("ts-button");
-  outputButtonsContainer.append(copyButtonElement);
-  copyButtonElement.addEventListener("click", () => {
-    const img = document.querySelector("#ts-output-inner > canvas");
-    img.toBlob((blob) => {
-      navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);
-    });
-  });
+  $(`
+    <button class="ts-button">Copy</button>
+  `)
+    .click(() => {
+      const img = document.querySelector("#ts-output-inner > canvas");
+      img.toBlob((blob) => {
+        navigator.clipboard.write([
+          new ClipboardItem({
+            [blob.type]: blob,
+          }),
+        ]);
+      });
+    })
+    .appendTo(menuElement.find("#ts-output-controls"));
 
-  document.body.append(menuElement);
+  $("body").append(menuElement);
 }
 
 async function captureImage(postRoot, progressElem) {

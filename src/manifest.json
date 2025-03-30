@@ -32,7 +32,12 @@
         "*://www.tumblr.com/privacy/*"
       ],
       "css": ["content_scripts/tumblr.css", "content_scripts/fonts.css"],
-      "js": ["lib/modern-screenshot.min.js", "lib/moment.min.js", "content_scripts/tumblr.js"]
+      "js": [
+        "lib/modern-screenshot.min.js",
+        "lib/moment.min.js",
+        "lib/jquery-3.7.1.slim.min.js",
+        "content_scripts/tumblr.js"
+      ]
     }
   ]
 }
