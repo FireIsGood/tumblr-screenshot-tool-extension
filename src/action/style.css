@@ -29,6 +29,28 @@ body {
   line-height: 1.5;
   color: #44476a;
   background-color: #e6e7ee;
+  --bg-size: 2.25;
+  --bg-rotation: 0.125;
+  --symbol-color: rgb(0, 0, 0, 0.06);
+  background-image: linear-gradient(-2.5deg, #e6e6e6, transparent 30%, transparent 70%, #e6e7ee),
+    repeating-linear-gradient(
+      calc(var(--bg-rotation) * 0.25turn),
+      transparent,
+      transparent calc(var(--bg-size) * 8px),
+      var(--symbol-color),
+      var(--symbol-color),
+      transparent calc(var(--bg-size) * 9px),
+      transparent calc(var(--bg-size) * 16px)
+    ),
+    repeating-linear-gradient(
+      calc(var(--bg-rotation) * 0.25turn + 0.25turn),
+      transparent,
+      transparent calc(var(--bg-size) * 8px),
+      var(--symbol-color),
+      var(--symbol-color),
+      transparent calc(var(--bg-size) * 9px),
+      transparent calc(var(--bg-size) * 16px)
+    );
 }
 
 button,
@@ -41,6 +63,8 @@ select {
 
 h1 {
   font-size: 2rem;
+  margin: 0;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
@@ -72,7 +96,7 @@ button {
 }
 
 main {
-  margin-inline: 1rem;
+  margin: 1rem;
 }
 
 .menu-controls {
