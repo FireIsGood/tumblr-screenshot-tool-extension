@@ -1,12 +1,18 @@
 "use strict";
 
+const debug = false; // For now just shows status messages
+
 let waitForLoad = false; // Track whether we are loading a new URL
 
+const statusElem = $("#status");
 const statusText = $("#status-text");
+const menuControls = $("#menu-controls");
 const scanPostsButton = $("#scan-posts");
 const toggleMenuButton = $("#toggle-menu");
 const connectedButtons = [scanPostsButton, toggleMenuButton];
 const unstyleButton = $("#unstyle-blog");
+const alertMessage = $("#alert-message");
+const alertMessageText = $("#alert-message-text");
 
 scanPostsButton.click(() => {
   chrome.runtime.sendMessage({ data: { event: "ts-target-articles" } });
@@ -44,30 +50,38 @@ async function checkConnection() {
   // Ignore pages that we wouldn't connect to
   if (!isTumblrHost) {
     statusText.text("Invalid website!");
-    connectedButtons.forEach((item) => item.attr("disabled", ""));
+    menuControls.addClass("hidden");
+    alertMessage.removeClass("hidden");
+    alertMessageText.text("This is not Tumblr");
+    alertMessageText.addClass("error");
     return;
   }
 
-  // Check if we're on a real page
-  if (!isCustomSubdomain) {
-    statusText.text("Checking Connection...");
-    const response = await chrome.runtime.sendMessage({ data: {} });
-    if (response.success) {
-      statusText.text("Connected!").addClass("success", "hidden-option");
-      connectedButtons.forEach((item) => item.removeClass("hidden-option"));
-      unstyleButton.addClass("hidden-option");
-    } else {
-      statusText.text("Disconnected...").addClass("error");
-    }
-  } else {
-    // If we're on a custom subdomain, instead have a button to swap to the normal version of the page
+  // If we're on a custom subdomain, instead have a button to swap to the normal version of the page
+  if (isCustomSubdomain) {
     statusText.text("styled blog, must unstyle");
     connectedButtons.forEach((item) => item.addClass("hidden-option"));
     unstyleButton.removeClass("hidden-option");
+    return;
+  }
+
+  // We're on the actual website!
+  statusText.text("Checking Connection...");
+  const response = await chrome.runtime.sendMessage({ data: {} });
+  if (response.success) {
+    statusText.text("Connected!").addClass("success", "hidden-option");
+    connectedButtons.forEach((item) => item.removeClass("hidden-option"));
+    unstyleButton.addClass("hidden-option");
+  } else {
+    statusText.text("Disconnected...").addClass("error");
   }
 }
 
 async function init() {
+  if (debug) {
+    statusElem.removeClass("hidden");
+  }
+
   checkConnection();
 
   // Add listeners
