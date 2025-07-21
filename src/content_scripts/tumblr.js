@@ -56,7 +56,6 @@ function addTargetingRing(postElem) {
   alignRing();
 
   // Add controls
-  let notesVisible = $(postElem).find("div.ePsyd")[0];
   const onHideCallback = [];
   const disableOnNotes = [];
   const updateCloseNotesButton = (elem) => {
@@ -73,10 +72,19 @@ function addTargetingRing(postElem) {
     $(event.target).addClass("hidden");
     onHideCallback.forEach((fn) => fn());
   });
-  if (notesVisible) {
+  if ($(postElem).find("div.ePsyd").length !== 0) {
     closeNotesButton.addClass("hidden");
   }
   closeNotesButton.appendTo(ringElement);
+
+  const keepReadingButton = $(postElem).find('[aria-label="Keep reading"]');
+  const expandPostButton = $('<button class="ts-ring-button secondary">Expand Post</button>').click((event) => {
+    keepReadingButton.click();
+    $(event.target).remove();
+  });
+  if (keepReadingButton.length !== 0) {
+    expandPostButton.appendTo(ringElement);
+  }
 
   const resetSelect = debounce((elem, text) => {
     elem.innerText = text;
@@ -118,6 +126,9 @@ function addTargetingRing(postElem) {
     .appendTo(ringElement);
 
   onHideCallback.push(() => console.log("HI"));
+
+  // Initial check
+  updateCloseNotesButton(closeNotesButton);
 
   // Observer for on body change
   const mutationObserver = new MutationObserver(() => {

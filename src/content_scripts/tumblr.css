@@ -186,6 +186,11 @@
     border-color: #cdddd6;
   }
 
+  &.secondary {
+    background-color: #daeaf7;
+    border-color: #cedbe5;
+  }
+
   &.icon-only {
     width: 2.575rem;
     height: 2.575rem;
