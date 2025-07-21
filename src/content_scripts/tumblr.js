@@ -56,24 +56,32 @@ function addTargetingRing(postElem) {
   alignRing();
 
   // Add controls
+  let notesVisible = $(postElem).find("div.ePsyd")[0];
+  const onHideCallback = [];
+  const disableOnNotes = [];
   const updateCloseNotesButton = (elem) => {
-    if ($(postElem).find("div.ePsyd").length === 0) return;
+    if ($(postElem).find("div.ePsyd").length === 0) {
+      elem.addClass("hidden");
+      disableOnNotes.forEach((elem) => elem.prop("disabled", false));
+      return;
+    }
     elem.removeClass("hidden");
+    disableOnNotes.forEach((elem) => elem.prop("disabled", true));
   };
   const closeNotesButton = $('<button class="ts-ring-button">Close Notes</button>').click((event) => {
     $(postElem).find("div.ePsyd").click();
     $(event.target).addClass("hidden");
+    onHideCallback.forEach((fn) => fn());
   });
-  closeNotesButton.addClass(() => {
-    if ($(postElem).find("div.ePsyd")[0]) return "";
-    return "hidden";
-  });
+  if (notesVisible) {
+    closeNotesButton.addClass("hidden");
+  }
   closeNotesButton.appendTo(ringElement);
 
   const resetSelect = debounce((elem, text) => {
     elem.innerText = text;
   }, 750);
-  $('<button class="ts-ring-button primary">Select</button>')
+  const selectButton = $('<button class="ts-ring-button primary">Select</button>')
     .click((event) => {
       openMenu();
       loadPostIntoMenu(postElem);
@@ -81,24 +89,26 @@ function addTargetingRing(postElem) {
       resetSelect(event.target, "Select");
     })
     .appendTo(ringElement);
+  disableOnNotes.push(selectButton);
+  onHideCallback.push(() => selectButton.prop("disabled", false));
 
   const resetCopy = debounce((elem, text) => {
     elem.innerText = text;
   }, 750);
+  const copyButton = $('<button class="ts-ring-button primary">Copy HTML</button>').click((event) => {
+    navigator.clipboard.writeText(postElem.outerHTML);
+    event.target.innerText = "Copied HTML!";
+    resetCopy(event.target, "Copy HTML");
+  });
+  disableOnNotes.push(copyButton);
+  onHideCallback.push(() => copyButton.prop("disabled", false));
+  const websiteButton = $(
+    '<a href="https://fireisgood.github.io/tumblr-screenshot-tool/" target="_blank" class="ts-web-link">website screenshotter</a>'
+  );
   $(`<div class="ts-button-vertical-stack">
     </div>`)
-    .append(
-      $('<button class="ts-ring-button primary">Copy HTML</button>').click((event) => {
-        navigator.clipboard.writeText(postElem.outerHTML);
-        event.target.innerText = "Copied HTML!";
-        resetCopy(event.target, "Copy HTML");
-      })
-    )
-    .append(
-      $(
-        '<a href="https://fireisgood.github.io/tumblr-screenshot-tool/" target="_blank" class="ts-web-link">website screenshotter</a>'
-      )
-    )
+    .append(copyButton)
+    .append(websiteButton)
     .appendTo(ringElement);
 
   $('<button class="ts-ring-button">&times;</button>')
@@ -107,12 +117,19 @@ function addTargetingRing(postElem) {
     })
     .appendTo(ringElement);
 
+  onHideCallback.push(() => console.log("HI"));
+
   // Observer for on body change
   const mutationObserver = new MutationObserver(() => {
     alignRing();
     updateCloseNotesButton(closeNotesButton);
+    console.log("Root mutated");
   });
-  mutationObserver.observe(document.body, { attributes: true, childList: true, subtree: true });
+  mutationObserver.observe(document.getElementById("root"), { attributes: true, childList: true, subtree: true });
+  const resizeObserver = new ResizeObserver(() => {
+    alignRing();
+  });
+  resizeObserver.observe(document.body);
 
   // Remove the ring if it goes off screen
   const intersectionObserver = new IntersectionObserver(
