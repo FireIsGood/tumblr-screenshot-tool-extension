@@ -27,9 +27,6 @@ disableScansButton.click(() => {
   disableScansButton.addClass("hidden");
   enableScansButton.removeClass("hidden");
 });
-toggleMenuButton.click(() => {
-  chrome.runtime.sendMessage({ data: { event: "ts-menu-toggle" } });
-});
 unstyleButton.click(async () => {
   unstyleButton.attr("disabled", "");
 
