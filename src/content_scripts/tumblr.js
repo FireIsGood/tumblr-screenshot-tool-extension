@@ -118,6 +118,16 @@ function selectArticles() {
   $("#base-container article").each((_, elem) => addTargetingRing(elem));
 }
 
+function addMenuOption() {
+  const menu = $("#glass-container [role='menu']");
+  if (menu.find(".ts-scan-posts-button").length > 0) return;
+  const newButton = $(
+    '<button role="menuitem" class="X1uIE v_1X3 ts-scan-posts-button" style="color: RGB(var(--purple));">Scan Posts</button>'
+  ).click(() => enableTargeting());
+
+  menu.append(newButton);
+}
+
 function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -131,8 +141,12 @@ async function init() {
   document.documentElement.addEventListener("ts-disable-targeting", disableTargeting);
 
   // Reselect articles when page updates
-  const observer = new MutationObserver(selectArticles);
-  observer.observe(document.getElementById("root"), { childList: true, subtree: true });
+  const articleObserver = new MutationObserver(selectArticles);
+  articleObserver.observe(document.getElementById("root"), { childList: true, subtree: true });
+
+  // Add extra options to post options menu
+  const menuObserver = new MutationObserver(addMenuOption);
+  menuObserver.observe(document.getElementById("glass-container"), { childList: true, subtree: true });
 
   console.log("%cScreenshot tool loaded!", "font-size: 2rem");
 }
