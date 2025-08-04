@@ -3,19 +3,29 @@
 const debug = false; // For now just shows status messages
 
 let waitForLoad = false; // Track whether we are loading a new URL
+let scanning = false;
 
 const statusElem = $("#status");
 const statusText = $("#status-text");
 const menuControls = $("#menu-controls");
-const scanPostsButton = $("#scan-posts");
-const toggleMenuButton = $("#toggle-menu");
-const connectedButtons = [scanPostsButton, toggleMenuButton];
+const enableScansButton = $("#enable-scans");
+const disableScansButton = $("#disable-scans");
+const connectedButtons = [enableScansButton, disableScansButton];
 const unstyleButton = $("#unstyle-blog");
 const alertMessage = $("#alert-message");
 const alertMessageText = $("#alert-message-text");
 
-scanPostsButton.click(() => {
-  chrome.runtime.sendMessage({ data: { event: "ts-target-articles" } });
+enableScansButton.click(() => {
+  chrome.runtime.sendMessage({ data: { event: "ts-enable-targeting" } });
+  scanning = true;
+  enableScansButton.addClass("hidden");
+  disableScansButton.removeClass("hidden");
+});
+disableScansButton.click(() => {
+  chrome.runtime.sendMessage({ data: { event: "ts-disable-targeting" } });
+  scanning = false;
+  disableScansButton.addClass("hidden");
+  enableScansButton.removeClass("hidden");
 });
 toggleMenuButton.click(() => {
   chrome.runtime.sendMessage({ data: { event: "ts-menu-toggle" } });
@@ -60,8 +70,8 @@ async function checkConnection() {
   // If we're on a custom subdomain, instead have a button to swap to the normal version of the page
   if (isCustomSubdomain) {
     statusText.text("styled blog, must unstyle");
-    connectedButtons.forEach((item) => item.addClass("hidden-option"));
-    unstyleButton.removeClass("hidden-option");
+    connectedButtons.forEach((item) => item.addClass("hidden"));
+    unstyleButton.removeClass("hidden");
     return;
   }
 
@@ -69,9 +79,9 @@ async function checkConnection() {
   statusText.text("Checking Connection...");
   const response = await chrome.runtime.sendMessage({ data: {} });
   if (response.success) {
-    statusText.text("Connected!").addClass("success", "hidden-option");
-    connectedButtons.forEach((item) => item.removeClass("hidden-option"));
-    unstyleButton.addClass("hidden-option");
+    statusText.text("Connected!").addClass("success", "hidden");
+    connectedButtons.forEach((item) => item.removeClass("hidden"));
+    unstyleButton.addClass("hidden");
   } else {
     statusText.text("Disconnected...").addClass("error");
   }
