@@ -36,16 +36,16 @@ function addTargetingRing(postElem) {
   const onHideCallback = [];
   const disableOnNotes = [];
   const closeNotesButton = $('<button class="ts-ring-button">Close Notes</button>').click((event) => {
-    $(postElem).find("div.ePsyd").click();
+    $(postElem).find('[aria-label="Reply"]').click();
     $(event.target).addClass("hidden");
     onHideCallback.forEach((fn) => fn());
   });
-  if ($(postElem).find("div.ePsyd").length !== 0) {
+  if ($(postElem).find("div.ltcIE").length !== 0) {
     closeNotesButton.addClass("hidden");
   }
   closeNotesButton.appendTo(ringElement);
   const updateCloseNotesButton = () => {
-    if ($(postElem).find("div.ePsyd").length === 0) {
+    if ($(postElem).find("div.ltcIE").length === 0) {
       closeNotesButton.addClass("hidden");
       disableOnNotes.forEach((closeNotesButton) => closeNotesButton.prop("disabled", false));
       return;
