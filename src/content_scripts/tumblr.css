@@ -32,6 +32,11 @@
   pointer-events: none;
 
   animation: fade-in 200ms ease-out;
+
+  > * {
+    position: sticky;
+    top: 1rem;
+  }
 }
 
 @keyframes fade-in {
