@@ -1,5 +1,7 @@
 "use strict";
 
+const closeNotesButtonSelector = "button.qf5_7.j4_3O.u1icf.wEQXZ.rZNeu.GqZGX";
+
 let scanPosts = false;
 let count = 0;
 
@@ -36,16 +38,16 @@ function addTargetingRing(postElem) {
   const onHideCallback = [];
   const disableOnNotes = [];
   const closeNotesButton = $('<button class="ts-ring-button">Close Notes</button>').click((event) => {
-    $(postElem).find("button.zn53i.KmpWV.Li_00").click();
+    $(postElem).find(closeNotesButtonSelector).click();
     $(event.target).addClass("hidden");
     onHideCallback.forEach((fn) => fn());
   });
-  if ($(postElem).find("button.zn53i.KmpWV.Li_00").length !== 0) {
+  if ($(postElem).find(closeNotesButtonSelector).length !== 0) {
     closeNotesButton.addClass("hidden");
   }
   closeNotesButton.appendTo(ringElement);
   const updateCloseNotesButton = () => {
-    if ($(postElem).find("button.zn53i.KmpWV.Li_00").length === 0) {
+    if ($(postElem).find(closeNotesButtonSelector).length === 0) {
       closeNotesButton.addClass("hidden");
       disableOnNotes.forEach((closeNotesButton) => closeNotesButton.prop("disabled", false));
       return;
